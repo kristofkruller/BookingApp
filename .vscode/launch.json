@@ -1,0 +1,32 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+      {
+          "name": "Debug Auth Service",
+          "type": "go",
+          "request": "launch",
+          "mode": "auto",
+          "program": "${workspaceFolder}/auth-service",
+          "env": {},
+          "args": []
+      },
+      {
+          "name": "Debug Check Service",
+          "type": "go",
+          "request": "launch",
+          "mode": "auto",
+          "program": "${workspaceFolder}/check-service",
+          "env": {},
+          "args": []
+      },
+      {
+          "name": "Debug Booking Service",
+          "type": "go",
+          "request": "launch",
+          "mode": "auto",
+          "program": "${workspaceFolder}/booking-service",
+          "env": {},
+          "args": []
+      }
+  ]
+}

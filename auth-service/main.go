@@ -11,7 +11,7 @@ import (
 
 func main() {
 	//DB
-	err := config.InitDB("postgres://user:password@localhost/BookingAppDb?sslmode=disable")
+	err := config.InitDB("postgres://admin:asdf1234@localhost/BookingAppDb?sslmode=disable")
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
@@ -22,5 +22,9 @@ func main() {
 	r.HandleFunc("/login", users.LoginHandler).Methods("POST")
 	r.HandleFunc("/logout", users.LogoutHandler).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8081", r))
+	log.Println("Listening on port 8081")
+	err = http.ListenAndServe(":8081", r)
+	if err != nil {
+		log.Fatalf("Failed to listen on port 8081: %v", err)
+	}
 }
