@@ -7,14 +7,8 @@
           "request": "launch",
           "mode": "auto",
           "program": "${workspaceFolder}/auth-service",
-          "env": {
-            "JWT_SECRET_KEY": "Hu7ky4L1f3*",
-            "DB_USER":"admin",
-            "DB_PASSWORD":"asdf1234",
-            "DB_HOST":"db",
-            "DB_NAME":"BookingApp",
-          },
-          "args": []
+          "envFile": "${workspaceFolder}/.env",
+          "args": ["--log", "info"]
       },
       {
           "name": "Debug Check Service",
@@ -22,8 +16,8 @@
           "request": "launch",
           "mode": "auto",
           "program": "${workspaceFolder}/check-service",
-          "env": {},
-          "args": []
+          "envFile": "${workspaceFolder}/.env",
+          "args": ["--log", "info"]
       },
       {
           "name": "Debug Booking Service",
@@ -31,8 +25,8 @@
           "request": "launch",
           "mode": "auto",
           "program": "${workspaceFolder}/booking-service",
-          "env": {},
-          "args": []
+          "envFile": "${workspaceFolder}/.env",
+          "args": ["--log", "info"]
       },
       {
         "name": "DBSeeder Service",
@@ -40,10 +34,8 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/db-seeder",
-        "env": {
-          "DB_CONNECTION_STRING":"postgres://admin:asdf1234@127.0.0.1/BookingAppDb?sslmode=disable"
-        },
-        "args": []
+        "envFile": "${workspaceFolder}/.env",
+        "args": ["--log", "info"]
       }
   ]
 }

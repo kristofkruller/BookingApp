@@ -2,8 +2,7 @@ version: '3.8'
 services:
   db:
     image: postgres:12-alpine
-    env_file:
-      - .env
+    env_file: .env
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
@@ -12,8 +11,7 @@ services:
       - bookingapp-network
 
   auth-service:
-    env_file:
-      - .env
+    env_file: .env
     build: ./auth-service
     ports:
       - "8081:8081"
@@ -23,8 +21,7 @@ services:
       - bookingapp-network
 
   check-service:
-    env_file:
-      - .env
+    env_file: .env
     build: ./check-service
     ports:
       - "8082:8082"
@@ -34,8 +31,7 @@ services:
       - bookingapp-network
 
   booking-service:
-    env_file:
-      - .env
+    env_file: .env
     build: ./booking-service
     ports:
       - "8083:8083"

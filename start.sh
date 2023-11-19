@@ -2,7 +2,14 @@
 
 # Function to check if a port is open
 is_port_open() {
-    nc -z localhost $1
+  nc -z 127.0.0.1 $1 &>/dev/null
+  local result=$?
+  if [ $result -eq 0 ]; then
+      echo "Port $port is open."
+  else
+      echo "Port $port is not open."
+  fi
+  return $result
 }
 
 # Function to start Docker services
@@ -17,14 +24,18 @@ start_docker_services() {
 
 # Function to wait for services to be ready
 wait_for_services() {
-    local retries=10
+    local retries=3
     while [ $retries -gt 0 ]; do
         if is_port_open 5432 && is_port_open 8081 && is_port_open 8082 && is_port_open 8083; then
             echo "All services started successfully."
             return 0
         else
             echo "Waiting for services to start... Retries left: $retries"
-            sleep 3
+            echo "Port 5432: $(is_port_open 5432)"
+            echo "Port 8081: $(is_port_open 8081)"
+            echo "Port 8082: $(is_port_open 8082)"
+            echo "Port 8083: $(is_port_open 8083)"
+            sleep 2
             ((retries--))
         fi
     done

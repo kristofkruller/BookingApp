@@ -1,22 +1,15 @@
 package users
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/kristofkruller/BookingApp/auth-service/config"
+	"github.com/kristofkruller/BookingApp/auth-service/libs"
 	"golang.org/x/crypto/bcrypt"
 )
-
-func hashPass(p string) (string, error) {
-	b, err := bcrypt.GenerateFromPassword([]byte(p), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
-}
 
 func ValidateUserPass(n, p string) (bool, error) {
 	u, err := GetUserByName(n)
@@ -28,14 +21,8 @@ func ValidateUserPass(n, p string) (bool, error) {
 	return err == nil, nil
 }
 
-// LoginRequest represents the JSON structure for a login request
-type LoginRequest struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-}
-
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var req LoginRequest
+	var req libs.LoginRequest
 
 	// Decode the JSON body
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -47,7 +34,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Validate the user's password
 	isValid, err := ValidateUserPass(req.Name, req.Password)
 	if err != nil {
-		http.Error(w, "Error validating user pass", http.StatusUnauthorized)
+		if err == sql.ErrNoRows {
+			// User not found
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		} else {
+			// Database or other server errors
+			http.Error(w, "Server error", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -60,7 +53,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// JWT session
-		tokenString, err := config.GenerateJWT(u.ID)
+		tokenString, err := libs.GenerateJWT(u.ID)
 		if err != nil {
 			http.Error(w, "Error at token creation", http.StatusInternalServerError)
 			return

@@ -35,10 +35,10 @@ Just fire the ./start.sh from the project root
 - `booking-service`: [8083](http://127.0.0.1:8083)
 - `db` is on default 5432
 
-### Development Env
+### Development Env and manual start
 The project is set up for development with VS Code through WSL Debian. A launch.json file is included for debugging:
 - `Run and Debug - Ctrl+Shift+D` then you can start all services separately without containerized environment.
-- Run `docker-compose -f docker-compose.yml up db -d` this will set up the db as a separate container but without the other services. You should seed it with ./db-seeder/main.go
+- Run `docker-compose -f docker-compose.yml up db -d` this will set up the db as a separate container but without the other services. You should seed it with `go run ./db-seeder/main.go`
 
 ### Env
 Exposed env content for development *env is not commited because of best practice*
