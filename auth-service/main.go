@@ -5,13 +5,19 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/kristofkruller/BookingApp/auth-service/config"
 	"github.com/kristofkruller/BookingApp/auth-service/users"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	//DB
-	err := config.InitDB("postgres://admin:asdf1234@localhost/BookingAppDb?sslmode=disable")
+	err = config.InitDB()
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 	}

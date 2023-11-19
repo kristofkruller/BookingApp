@@ -2,6 +2,8 @@ package config
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -9,7 +11,13 @@ import (
 var db *sql.DB
 
 // InitDB connects to the database
-func InitDB(dbConnString string) error {
+func InitDB() error {
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbName := os.Getenv("DB_NAME")
+	dbConnString := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbName)
+
 	var err error
 	db, err = sql.Open("postgres", dbConnString)
 	if err != nil {

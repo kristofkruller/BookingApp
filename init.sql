@@ -3,7 +3,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
     password VARCHAR(255),
-    email VARCHAR(255)
+    email VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE properties (
@@ -28,10 +28,8 @@ CREATE TABLE rooms (
 );
 
 -- Seed users
-INSERT INTO users (name, password, email) VALUES 
-('admin', 'asdf1234', 'admin@example.com'),
-('user1', 'password1', 'user1@example.com'),
-('user2', 'password2', 'user2@example.com');
+-- INSERT INTO users (name, password, email) VALUES 
+-- ('u', 'pass', 'u@example.com'),
 
 -- Seed properties (2 hotels, 1 house, 2 flats)
 INSERT INTO properties (address, contact_name, contact_phone, contact_email, tags, rating, type) VALUES 
