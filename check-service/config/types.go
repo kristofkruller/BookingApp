@@ -1,21 +1,8 @@
-package assets
+package config
 
 import (
 	"github.com/jackc/pgtype"
 )
-
-type User struct {
-	ID       int
-	Name     string
-	Email    string
-	Password string
-}
-
-// LoginRequest represents the JSON structure for a login request
-type LoginRequest struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-}
 
 type Property struct {
 	ID           int     `json:"id"`

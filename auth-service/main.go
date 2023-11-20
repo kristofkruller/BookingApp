@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/kristofkruller/BookingApp/auth-service/config"
+	"github.com/kristofkruller/BookingApp/auth-service/initdb"
 	"github.com/kristofkruller/BookingApp/auth-service/users"
 )
 
@@ -26,7 +26,7 @@ func main() {
 	// Initialize database with retry
 	var db *sql.DB
 	for i := 0; i < maxRetries; i++ {
-		db, err = config.InitDB()
+		db, err = initdb.InitDB()
 		if err == nil {
 			break
 		}
@@ -43,6 +43,7 @@ func main() {
 		log.Fatalf("Could not connect to database after %d attempts: %v", maxRetries, err)
 	}
 
+	//DB conn for users pkg
 	users.SetDB(db)
 
 	//ROUTER

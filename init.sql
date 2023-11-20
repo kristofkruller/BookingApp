@@ -29,13 +29,12 @@ CREATE TABLE rooms (
 
 CREATE TABLE reserv (
     id SERIAL PRIMARY KEY,
-    userName VARCHAR(255) REFERENCES users(name),
+    userId INT REFERENCES users(id),
     propertyId INT REFERENCES properties(id),
     roomId INT REFERENCES rooms(id),
-    roomQty INT REFERENCES rooms(count),
-    cost DECIMAL(10,2) REFERENCES rooms(price),
-    reserv_interval tsrange,
-)
+    cost DECIMAL(10,2),
+    reserv_interval tsrange
+);
 
 -- Seed users
 -- INSERT INTO users (name, password, email) VALUES 

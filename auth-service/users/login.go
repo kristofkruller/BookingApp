@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kristofkruller/BookingApp/assets"
+	"github.com/kristofkruller/BookingApp/auth-service/config"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,7 +22,7 @@ func ValidateUserPass(n, p string) (bool, error) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var req assets.LoginRequest
+	var req config.LoginRequest
 
 	// Decode the JSON body
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -53,7 +53,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// JWT session
-		tokenString, err := assets.GenerateJWT(u.ID)
+		tokenString, err := config.GenerateJWT(u.ID)
 		if err != nil {
 			http.Error(w, "Error at token creation", http.StatusInternalServerError)
 			return

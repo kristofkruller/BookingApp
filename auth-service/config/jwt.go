@@ -1,4 +1,4 @@
-package assets
+package config
 
 import (
 	"fmt"

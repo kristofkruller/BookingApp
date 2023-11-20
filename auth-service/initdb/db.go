@@ -1,11 +1,10 @@
-package config
+package initdb
 
 import (
 	"database/sql"
 	"fmt"
 	"os"
 
-	"github.com/kristofkruller/BookingApp/auth-service/users"
 	_ "github.com/lib/pq"
 )
 
@@ -26,14 +25,4 @@ func InitDB() (*sql.DB, error) {
 	}
 	// Return the db connection
 	return db, nil
-}
-
-// GetDB returns the database connection
-func GetDB() *sql.DB {
-	return db
-}
-
-// SetDB allows other packages to set the database connection
-func SetDB(database *sql.DB) {
-	users.SetDB(database)
 }

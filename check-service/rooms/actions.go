@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/kristofkruller/BookingApp/assets"
+	"github.com/kristofkruller/BookingApp/check-service/config"
 )
 
 var db *sql.DB
@@ -33,7 +33,7 @@ func GetRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// qry
-	rm := &assets.Room{}
+	rm := &config.Room{}
 	err = db.QueryRow("SELECT id, room_nr, hotel, description, count, price, availability_interval FROM rooms WHERE id = $1", roomID).Scan(
 		&rm.ID, &rm.RoomNumber, &rm.HotelID, &rm.Description, &rm.Count, &rm.Price, &rm.AvailabilityInterval,
 	)
