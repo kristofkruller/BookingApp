@@ -27,6 +27,7 @@ services:
       - "8082:8082"
     depends_on:
       - db
+      - auth-service
     networks:
       - bookingapp-network
 
@@ -37,8 +38,10 @@ services:
       - "8083:8083"
     depends_on:
       - db
+      - auth-service
     networks:
       - bookingapp-network
+
 networks:
   bookingapp-network:
     driver: bridge

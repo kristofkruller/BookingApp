@@ -27,6 +27,16 @@ CREATE TABLE rooms (
     availability_interval tsrange
 );
 
+CREATE TABLE reserv (
+    id SERIAL PRIMARY KEY,
+    userName VARCHAR(255) REFERENCES users(name),
+    propertyId INT REFERENCES properties(id),
+    roomId INT REFERENCES rooms(id),
+    roomQty INT REFERENCES rooms(count),
+    cost DECIMAL(10,2) REFERENCES rooms(price),
+    reserv_interval tsrange,
+)
+
 -- Seed users
 -- INSERT INTO users (name, password, email) VALUES 
 -- ('u', 'pass', 'u@example.com'),

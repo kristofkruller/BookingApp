@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -47,6 +48,9 @@ func main() {
 	//ROUTER
 	r := mux.NewRouter()
 
+	r.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Auth-service up")
+	}).Methods("GET")
 	r.HandleFunc("/login", users.LoginHandler).Methods("POST")
 	r.HandleFunc("/logout", users.LogoutHandler).Methods("POST")
 
