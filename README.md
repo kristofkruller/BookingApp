@@ -49,7 +49,7 @@ _I assume a formatted string from a date picker by date values_
 For requests with filtering it is possible to use only a "partly" filter, but with logical pair i.e.:
 ```
 {
- 	"availability_start": "2023-01-01",
+  "availability_start": "2023-01-01",
   "availability_end": "2023-01-10"
 }
 _or_
@@ -59,37 +59,47 @@ _or_
 }
 _or_
 {
-	"creation_date": "2023-11-20"
+  "creation_date": "2023-11-20"
 }
 _or combined even_
 {
-	"creation_date": "2023-11-20",
+  "creation_date": "2023-11-20",
   "start_date": "2023-02-01",
   "end_date": "2023-02-05"
 }
+etc.
 ```
+**if you want a filter-free list then post and empty JSON object `{}` with the REQ to get the full array as RES**
+
 ### Auth
 - [:8081/check] GET expects nothing
 _Response text: Auth-service up_
-- [:8081/login] POST expects REQ Body Params (JSON format):
-"name":"string"
-"password":"string"
+- [:8081/login] POST expects:
+```
+REQ Body Params (JSON format):
+{
+  "name":"string",
+  "password":"string"
+}
+```
 _Response feedback msg, http only cookie with jwt token exp. 1hr_
-- [:8081/logout] POST set cookie by name to be expired
+- [:8081/logout] POST invalidate by setting cookie to be expired
 _Response feedback msg, cookie data, and empty token val_
 
 ### Check
 - [:8081/check] GET expects nothing
 _Response text: Check-service up_
 - [:8082/room/{id}] GET expects an int for ID
-_Response a JSON with all data of the selected room_
+_Response a JSON object with all data of the selected room_
 - [:8082/rooms] POST with **optional** filter params:
 ```
 REQ Body Params (JSON format):
-price_min: DECIMAL(10,2) i.e.:50.00,
-price_max: DECIMAL(10,2) i.e.:50.00,
-availability_start: "YYYY-MM-DD",
-availability_end: "YYYY-MM-DD"
+{
+  price_min: DECIMAL(10,2) i.e.:50.00,
+  price_max: DECIMAL(10,2) i.e.:50.00,
+  availability_start: "YYYY-MM-DD",
+  availability_end: "YYYY-MM-DD"
+}
 ```
 _Response a JSON list(array of objects) of rooms matching the filters_
 
@@ -101,10 +111,10 @@ _Response text: Booking-service up_
 REQ Body Params (JSON format):
 {
   "min_price": numeric,
-  "max_price": numeric
+  "max_price": numeric,
   "creation_date": "YYYY-MM-DD",
   "start_date": "YYYY-MM-DD",
-  "end_date": "YYYY-MM-DD",
+  "end_date": "YYYY-MM-DD"
 }
 ```
 _Response a JSON list(array of objects) of bookings matching the filters_
@@ -117,7 +127,9 @@ It is functioning as a go "script".
 
 ### Env
 **MUST BE CREATED AT PROJECT _ROOT ._**
-Exposed env content for development *env is not commited because of best practice*
+_Exposed env content for development_
+*env is not commited because of best practice*
+```
 DB_PASSWORD=asdf1234
 POSTGRES_DB=BookingAppDb
 POSTGRES_USER=admin
@@ -127,11 +139,13 @@ DB_USER=admin
 DB_HOST=db
 DB_NAME=BookingAppDb
 DB_CONNECTION_SEED=postgres://admin:asdf1234@127.0.0.1/BookingAppDb?sslmode=disable
+```
 
 ### Development Env and manual start
 The project is set up for development with VS Code through WSL Debian. A launch.json file is included for debugging:
 - `Run and Debug - Ctrl+Shift+D` then you can start all services separately without containerized environment.
 - Run `docker-compose -f docker-compose.yml up db -d` this will set up the db as a separate container but without the other services. You should seed it with `go run ./db-seeder/main.go`
+To let the services consume the env file you must modify files (implement godotenv.Load(), use env-flagging, etc.) this is not finished yet completely.
 
 ### Notes on Security
 JWT secret keys and database passwords are managed via environment variables for security.
