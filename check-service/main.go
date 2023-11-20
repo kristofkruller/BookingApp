@@ -21,7 +21,6 @@ const (
 )
 
 func main() {
-
 	var err error
 
 	// Initialize database with retry
@@ -54,7 +53,7 @@ func main() {
 		fmt.Fprint(w, "Check-service up")
 	}).Methods("GET")
 	r.HandleFunc("/room/{id}", rooms.GetRoom).Methods("GET")
-	// r.HandleFunc("/rooms", rooms.ListRooms).Methods("GET")
+	r.HandleFunc("/rooms", rooms.ListRooms).Methods("POST")
 
 	srv := &http.Server{
 		Addr:    ":8082",

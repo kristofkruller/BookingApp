@@ -24,3 +24,10 @@ type Room struct {
 	Price                float64        `json:"price"`
 	AvailabilityInterval pgtype.Tsrange `json:"availability_interval"`
 }
+
+type RoomFilter struct {
+	PriceMin *float64 `json:"price_min,omitempty"`
+	PriceMax *float64 `json:"price_max,omitempty"`
+	AvaStart *string  `json:"availability_start,omitempty"`
+	AvaEnd   *string  `json:"availability_end,omitempty"`
+}

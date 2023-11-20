@@ -21,7 +21,12 @@ The PostgreSQL database is set up with the following tables:
 ### Installation
 1. `git clone` [https://github.com/kristofkruller/BookingApp.git]
 2. `cd BookingApp`
-Just fire the ./start.sh from the project root
+3. start:
+`a)` Just fire the ./start.sh from the project root 
+**_OR_** 
+`b)` docker-compose up --build and if done go run ./db-seeder/main.go
+important that either way wait for `Database seeding completed successfully` CLI feedback
+
 
 ### Prerequisites
 - Docker compose v3.8
@@ -35,11 +40,48 @@ Just fire the ./start.sh from the project root
 - `db` is on default 5432
 
 ## API list
+If you post a request set the body type to JSON and include desired content I use [Insomnia API](https://insomnia.rest/)
 ### Auth
-- [:8081/login] POST expects JSON format {"name":"string","password":"string"},
+- [:8081/check] GET expects nothing
+_Response text: Auth-service up_
+- [:8081/login] POST expects Body Params (JSON format):
+"name":"string"
+"password":"string"
 _Response feedback msg, http only cookie with jwt token exp. 1hr_
 - [:8081/logout] POST set cookie by name to be expired
 _Response feedback msg, cookie data, and empty token val_
+
+### Check
+- [:8081/check] GET expects nothing
+_Response text: Check-service up_
+- [:8082/room/{id}] GET expects an int for ID
+_Response a JSON with all data of the selected room_
+- [:8082/rooms] POST with **optional** filter params:
+```
+Body Params (JSON format):
+price_min: DECIMAL(10,2) i.e.:50.00
+price_max: DECIMAL(10,2) i.e.:50.00
+_ava. I assume a formatted string from a date picker:_
+availability_start: (format: YYYY-MM-DD) i.e.:"2023-01-01"
+availability_end: (format: YYYY-MM-DD) i.e.:"2023-01-01"
+```
+it is possible to use only a partly filter, but with logical pair i.e.:
+```
+{
+ 	"availability_start": "2023-01-01",
+  "availability_end": "2023-01-10"
+}
+_or_
+{
+  "price_min": 60.00,
+  "price_max": 70.00
+}
+```
+_Response a JSON list of rooms matching the filters_
+
+### Booking
+- [:8083/check] GET expects nothing
+_Response text: Booking-service up_
 
 ## Details, mechanics
 ### Seeding

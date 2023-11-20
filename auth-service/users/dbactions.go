@@ -18,7 +18,11 @@ func GetUserByName(n string) (*config.User, error) {
 		return nil, errors.New("database connection is not initialized")
 	}
 	u := &config.User{}
-	err := db.QueryRow("SELECT id, name, email, password FROM users WHERE name = $1", n).Scan(&u.ID, &u.Name, &u.Email, &u.Password)
+	err := db.QueryRow(`
+			SELECT id, name, email, password 
+			FROM users 
+			WHERE name = $1
+		`, n).Scan(&u.ID, &u.Name, &u.Email, &u.Password)
 	if err != nil {
 		return nil, err
 	}
