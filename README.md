@@ -25,8 +25,12 @@ The PostgreSQL database is set up with the following tables:
 `a)` Just fire the ./start.sh from the project root 
 **_OR_** 
 `b)` docker-compose up --build and if done go run ./db-seeder/main.go
-important that either way wait for `Database seeding completed successfully` CLI feedback
-
+**_important_** that either way wait for both
+```
+Admin user seeded successfully.
+Reservations seeded successfully.
+```
+CLI feedbacks
 
 ### Prerequisites
 - Docker compose v3.8
@@ -41,10 +45,33 @@ important that either way wait for `Database seeding completed successfully` CLI
 
 ## API list
 If you post a request set the body type to JSON and include desired content I use [Insomnia API](https://insomnia.rest/)
+_I assume a formatted string from a date picker by date values_
+For requests with filtering it is possible to use only a "partly" filter, but with logical pair i.e.:
+```
+{
+ 	"availability_start": "2023-01-01",
+  "availability_end": "2023-01-10"
+}
+_or_
+{
+  "price_min": 60,
+  "price_max": 70
+}
+_or_
+{
+	"creation_date": "2023-11-20"
+}
+_or combined even_
+{
+	"creation_date": "2023-11-20",
+  "start_date": "2023-02-01",
+  "end_date": "2023-02-05"
+}
+```
 ### Auth
 - [:8081/check] GET expects nothing
 _Response text: Auth-service up_
-- [:8081/login] POST expects Body Params (JSON format):
+- [:8081/login] POST expects REQ Body Params (JSON format):
 "name":"string"
 "password":"string"
 _Response feedback msg, http only cookie with jwt token exp. 1hr_
@@ -58,34 +85,33 @@ _Response text: Check-service up_
 _Response a JSON with all data of the selected room_
 - [:8082/rooms] POST with **optional** filter params:
 ```
-Body Params (JSON format):
-price_min: DECIMAL(10,2) i.e.:50.00
-price_max: DECIMAL(10,2) i.e.:50.00
-_ava. I assume a formatted string from a date picker:_
-availability_start: (format: YYYY-MM-DD) i.e.:"2023-01-01"
-availability_end: (format: YYYY-MM-DD) i.e.:"2023-01-01"
+REQ Body Params (JSON format):
+price_min: DECIMAL(10,2) i.e.:50.00,
+price_max: DECIMAL(10,2) i.e.:50.00,
+availability_start: "YYYY-MM-DD",
+availability_end: "YYYY-MM-DD"
 ```
-it is possible to use only a partly filter, but with logical pair i.e.:
-```
-{
- 	"availability_start": "2023-01-01",
-  "availability_end": "2023-01-10"
-}
-_or_
-{
-  "price_min": 60.00,
-  "price_max": 70.00
-}
-```
-_Response a JSON list of rooms matching the filters_
+_Response a JSON list(array of objects) of rooms matching the filters_
 
 ### Booking
 - [:8083/check] GET expects nothing
 _Response text: Booking-service up_
+- [:8083/bookingsof/{uId}] POST with **optional** filter params:
+```
+REQ Body Params (JSON format):
+{
+  "min_price": numeric,
+  "max_price": numeric
+  "creation_date": "YYYY-MM-DD",
+  "start_date": "YYYY-MM-DD",
+  "end_date": "YYYY-MM-DD",
+}
+```
+_Response a JSON list(array of objects) of bookings matching the filters_
 
 ## Details, mechanics
 ### Seeding
-The db-seeder service runs automatically during **start.sh** and seeds the users table.
+The db-seeder service runs automatically during **start.sh** and seeds the users and reserv tables.
 The admin user is seeded with a bcrypt-hashed password for enhanced security.
 It is functioning as a go "script".
 

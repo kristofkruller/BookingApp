@@ -3,6 +3,7 @@ package users
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,39 +12,55 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func ValidateUserPass(n, p string) (bool, error) {
-	u, err := GetUserByName(n)
-	if err != nil {
-		return false, err
+var db *sql.DB
+
+func SetDB(database *sql.DB) {
+	db = database
+}
+
+func GetUserByName(n string) (*config.User, error) {
+	if db == nil {
+		return nil, errors.New("database connection is not initialized")
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(p))
-	return err == nil, nil
+	u := &config.User{}
+
+	// QRY
+	err := db.QueryRow(`
+			SELECT id, name, email, password 
+			FROM users 
+			WHERE name = $1
+		`, n).Scan(&u.ID, &u.Name, &u.Email, &u.Password)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var req config.LoginRequest
 
-	// Decode the JSON body
+	// DECODE
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// Validate the user's password
-	isValid, err := ValidateUserPass(req.Name, req.Password)
+	// VALIDATE
+	isValid, err := validateUserPass(req.Name, req.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// User not found
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		} else {
-			// Database or other server errors
+			// Database or other
 			http.Error(w, "Server error", http.StatusInternalServerError)
 		}
 		return
 	}
 
+	// VALID
 	if isValid {
 		fmt.Println("login ok, starting token creation")
 		u, err := GetUserByName(req.Name)
@@ -59,7 +76,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Set the token as an HTTP-only cookie
+		// RESPONSE Set the token as an HTTP-only cookie
 		http.SetCookie(w, &http.Cookie{
 			Name:     "token",
 			Value:    tokenString,
@@ -72,8 +89,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// clear the JWT cookie
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	// CLEAR the JWT cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    "",
@@ -82,4 +99,15 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	fmt.Fprint(w, "Logout Successful")
+}
+
+// HELPERS
+func validateUserPass(n, p string) (bool, error) {
+	u, err := GetUserByName(n)
+	if err != nil {
+		return false, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(p))
+	return err == nil, nil
 }

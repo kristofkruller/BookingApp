@@ -45,5 +45,18 @@ func main() {
 		log.Fatalf("Error seeding admin user: %v", err)
 	}
 
-	fmt.Println("Database seeding completed successfully")
+	fmt.Println("Admin user seeded successfully.")
+
+	// Seed reservations
+	_, err = db.Exec(`
+		INSERT INTO reserv (userId, propertyId, roomId, cost, reserv_interval) VALUES 
+		(1, 1, 1, 300.00, '[2023-02-01, 2023-02-05]'),
+		(1, 1, 2, 450.00, '[2023-03-10, 2023-03-15]'),
+		(1, 1, 3, 500.00, '[2023-04-20, 2023-04-25]');
+	`)
+	if err != nil {
+		log.Fatalf("Error seeding reservations: %v", err)
+	}
+
+	fmt.Println("Reservations seeded successfully.")
 }
