@@ -53,6 +53,8 @@ func main() {
 		fmt.Fprint(w, "Booking-service up")
 	}).Methods("GET")
 	r.HandleFunc("/bookingsof/{uId}", reserv.BookingsOf).Methods("POST")
+	r.HandleFunc("/letsbook", reserv.LetsBook).Methods("POST")
+	r.HandleFunc("/dontbook/{bookingId}", reserv.DontBook).Methods("POST")
 
 	srv := &http.Server{
 		Addr:    ":8083",

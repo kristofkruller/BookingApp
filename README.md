@@ -70,6 +70,7 @@ _or combined even_
 etc.
 ```
 **if you want a filter-free list then post and empty JSON object `{}` with the REQ to get the full array as RES**
+float in this case below always a DECIMAL(10,2)
 
 ### Auth
 - [:8081/check] GET expects nothing
@@ -95,8 +96,8 @@ _Response a JSON object with all data of the selected room_
 ```
 REQ Body Params (JSON format):
 {
-  price_min: DECIMAL(10,2) i.e.:50.00,
-  price_max: DECIMAL(10,2) i.e.:50.00,
+  price_min: float,
+  price_max: float,
   availability_start: "YYYY-MM-DD",
   availability_end: "YYYY-MM-DD"
 }
@@ -110,14 +111,27 @@ _Response text: Booking-service up_
 ```
 REQ Body Params (JSON format):
 {
-  "min_price": numeric,
-  "max_price": numeric,
+  "min_price": float,
+  "max_price": float,
   "creation_date": "YYYY-MM-DD",
   "start_date": "YYYY-MM-DD",
   "end_date": "YYYY-MM-DD"
 }
 ```
 _Response a JSON list(array of objects) of bookings matching the filters_
+- [:8083/letsbook] POST with **mandatory** params:
+```
+REQ Body Params (JSON format):
+{
+  "userId": int,
+  "propertyId": int,
+  "roomId": int,
+  "cost": float,
+  "start_date": "YYYY-MM-DD",
+  "end_date": "YYYY-MM-DD"
+}
+```
+- [:8083/dontbook/{bookingId}] POST to delete a booking by id
 
 ## Details, mechanics
 ### Seeding
@@ -147,6 +161,8 @@ The project is set up for development with VS Code through WSL Debian. A launch.
 - Run `docker-compose -f docker-compose.yml up db -d` this will set up the db as a separate container but without the other services. You should seed it with `go run ./db-seeder/main.go`
 To let the services consume the env file you must modify files (implement godotenv.Load(), use env-flagging, etc.) this is not finished yet completely.
 
-### Notes on Security
-JWT secret keys and database passwords are managed via environment variables for security.
-Use HTTPS in production to ensure secure communication.
+## Notes on possible improvements
+- Helper functions, types and code for general use must be regorganized to a "lib", with functionality like in every `main.go` the program exits gracefully or time handlers. 
+- For large datasets, consider indexing the reserv_interval column in the reserv table.
+- Queries should be transferred into postgre as a function
+- Frontend should be one GUI with an nginx reverse proxy channeled to :443

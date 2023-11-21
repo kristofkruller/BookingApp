@@ -161,10 +161,19 @@ func BookingsOf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return the bookings as JSON
+	// RETURN
+	// as JSON
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(bookings); err != nil {
 		log.Printf("Error encoding bookings to JSON: %v", err)
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 	}
 }
+
+// func printBookingsToConsole(bookings []*config.Booking) {
+// 	log.Println("Booking History:")
+// 	for _, booking := range bookings {
+// 		log.Printf("ID: %d, UserID: %d, PropertyID: %d, RoomID: %d, Cost: %.2f, Interval: %v, Creation Date: %v\n",
+// 			booking.ID, booking.UserID, booking.PropertyID, booking.RoomID, booking.Cost, booking.ReservInterval, booking.CreationDate)
+// 	}
+// }
