@@ -26,6 +26,7 @@ The PostgreSQL database is set up with the following tables:
 **_OR_** 
 `b)` docker-compose up --build and if done go run ./db-seeder/main.go
 **_important_** that either way wait for both
+docker compose will log to your terminal as access and error log
 ```
 Admin user seeded successfully.
 Reservations seeded successfully.
@@ -44,6 +45,7 @@ CLI feedbacks
 - `db` is on default 5432
 
 ## API list
+### provided API json at ./utils/ 
 If you post a request set the body type to JSON and include desired content I use [Insomnia API](https://insomnia.rest/)
 _I assume a formatted string from a date picker by date values_
 For requests with filtering it is possible to use only a "partly" filter, but with logical pair i.e.:
@@ -131,7 +133,25 @@ REQ Body Params (JSON format):
   "end_date": "YYYY-MM-DD"
 }
 ```
+_Response text: Booking created successfully_
 - [:8083/dontbook/{bookingId}] POST to delete a booking by id
+_Response text: Booking canceled successfully_
+
+### Payment
+- [:8084/check] GET expects nothing
+_Response text: Payment-service up_
+- [:8084/pay/{bookingId}] POST to pay booking by id with **mandatory** params:
+```
+REQ Body Params (JSON format):
+{
+  "bookingId": int,
+  "amount": float,
+  "currency": string,
+  "cardToken": string
+}
+```
+_Response JSON object about success or failed_
+
 
 ## Details, mechanics
 ### Seeding
@@ -158,11 +178,13 @@ DB_CONNECTION_SEED=postgres://admin:asdf1234@127.0.0.1/BookingAppDb?sslmode=disa
 ### Development Env and manual start
 The project is set up for development with VS Code through WSL Debian. A launch.json file is included for debugging:
 - `Run and Debug - Ctrl+Shift+D` then you can start all services separately without containerized environment.
-- Run `docker-compose -f docker-compose.yml up db -d` this will set up the db as a separate container but without the other services. You should seed it with `go run ./db-seeder/main.go`
+- Run `docker-compose -f docker-compose.yml up db` this will set up the db as a separate container but without the other services. You should seed it with `go run ./db-seeder/main.go`
 To let the services consume the env file you must modify files (implement godotenv.Load(), use env-flagging, etc.) this is not finished yet completely.
 
 ## Notes on possible improvements
-- Helper functions, types and code for general use must be regorganized to a "lib", with functionality like in every `main.go` the program exits gracefully or time handlers. 
+- Helper functions, types and code for general use must be regorganized to a lib, with functionality like in every `main.go` the program exits gracefully or time handlers. 
+- Error handling and logging should be ogranized to a service or lib also health checkers for db, and endpoints
+- Testcases
 - For large datasets, consider indexing the reserv_interval column in the reserv table.
 - Queries should be transferred into postgre as a function
 - Frontend should be one GUI with an nginx reverse proxy channeled to :443

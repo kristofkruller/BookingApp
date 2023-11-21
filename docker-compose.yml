@@ -39,6 +39,19 @@ services:
     depends_on:
       - db
       - auth-service
+      - check-service
+    networks:
+      - bookingapp-network
+
+  payment-service:
+    env_file: .env
+    build: ./payment-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - db
+      - auth-service
+      - booking-service
     networks:
       - bookingapp-network
 

@@ -5,4 +5,5 @@ use (
     ./check-service
     ./booking-service
     ./db-seeder
+    ./payment-service
 )
