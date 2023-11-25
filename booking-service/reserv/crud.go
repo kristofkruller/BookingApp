@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgtype"
 	"github.com/kristofkruller/BookingApp/booking-service/config"
-	"github.com/kristofkruller/BookingApp/booking-service/helpers"
+	"github.com/kristofkruller/BookingApp/libs/helpers"
 )
 
 func LetsBook(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +61,7 @@ func LetsBook(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Parsed availability period: [%s, %s]", start.Format(time.RFC3339), end.Format(time.RFC3339))
 
 	// AVA
-	if bp != nil && !isRoomAvailable(br.RoomID, *bp) {
+	if bp != nil && !helpers.IsRoomAvailable(br.RoomID, *bp, db) {
 		log.Printf("Room ID %d is not available for the requested period", br.RoomID)
 		http.Error(w, "Room is not available for the selected dates", http.StatusConflict)
 		return
@@ -124,34 +124,4 @@ func DontBook(w http.ResponseWriter, r *http.Request) {
 	log.Printf("CancelBooking: Booking canceled successfully in %v", time.Since(st))
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "Booking canceled successfully")
-}
-
-// HELPERS
-func isRoomAvailable(roomID int, period pgtype.Tsrange) bool {
-	var count int
-	var lower, upper pgtype.Timestamp
-	lower.Set(period.Lower.Time)
-	upper.Set(period.Upper.Time)
-
-	tsrange := pgtype.Tsrange{
-		Lower:     lower,
-		Upper:     upper,
-		LowerType: period.LowerType,
-		UpperType: period.UpperType,
-		Status:    pgtype.Present,
-	}
-
-	err := db.QueryRow(`
-			SELECT COUNT(*) 
-			FROM reserv 
-			WHERE roomId = $1 
-			AND reserv_interval && $2
-	`, roomID, tsrange).Scan(&count)
-
-	if err != nil {
-		log.Printf("Error in isRoomAvailable: %v", err)
-		return false
-	}
-
-	return count == 0
 }

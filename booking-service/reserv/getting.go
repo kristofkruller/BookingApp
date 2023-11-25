@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kristofkruller/BookingApp/booking-service/config"
-	"github.com/kristofkruller/BookingApp/booking-service/helpers"
+	"github.com/kristofkruller/BookingApp/libs/helpers"
 )
 
 var db *sql.DB
