@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/kristofkruller/BookingApp/check-service/initdb"
 	"github.com/kristofkruller/BookingApp/check-service/rooms"
+	"github.com/kristofkruller/BookingApp/libs/initdb"
 )
 
 const (
