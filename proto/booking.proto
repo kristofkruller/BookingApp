@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/kristofkruller/BookingApp/pb";
+
+// TYPES
+message Tsrange {
+  google.protobuf.Timestamp StartDate = 1;
+  google.protobuf.Timestamp EndDate = 2;
+}
+message Booking {
+  int32 id = 1;
+  int32 userId = 2;
+  int32 propertyId = 3;
+	int32 roomId = 4;
+	float cost = 5;
+	Tsrange reserv_interval = 6;
+	google.protobuf.Timestamp creation_date = 7;
+}
+
+// REQ
+message DontReq {
+  int32 bookingId = 1;
+}
+message BookingsOfReq {
+  int32 uId = 1;
+}
+message BookingReq {
+  int32 user_id = 1;
+  int32 property_id = 2;
+  int32 room_id = 3;
+  double cost = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+}
+
+// RES
+message BookingsRes {
+  repeated Booking bookings = 1;
+}
+message DontRes {
+  string cancelled = 2;
+}
+
+// Booking service definition
+service BookingService {
+  rpc LetsBook (BookingReq) returns (BookingsRes);
+  rpc DontBook (DontReq) returns (DontRes);
+  rpc BookingsOf (BookingsOfReq) returns (BookingsRes);
+}

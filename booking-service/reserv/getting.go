@@ -164,6 +164,7 @@ func BookingsOf(w http.ResponseWriter, r *http.Request) {
 	// RETURN
 	// as JSON
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(bookings); err != nil {
 		log.Printf("Error encoding bookings to JSON: %v", err)
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)

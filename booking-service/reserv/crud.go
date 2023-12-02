@@ -75,14 +75,46 @@ func LetsBook(w http.ResponseWriter, r *http.Request) {
 		br.UserID, br.PropertyID, br.RoomID, br.Cost, br.StartDate, br.EndDate,
 	)
 	if err != nil {
-		log.Printf("CreateBooking: Error creating booking: %v", err)
+		log.Printf("Error creating booking: %v", err)
 		http.Error(w, "Error creating booking", http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("CreateBooking: Booking created successfully in %v", time.Since(st))
+	// all booking of user refreshed directly from db for validation
+	var cb []config.Booking
+	cbrows, err := db.Query(`
+		SELECT *
+		FROM reserv
+		WHERE userId = $1`,
+		&br.UserID,
+	)
+	if err != nil {
+		log.Printf("Error validating bookings of user: %v", err)
+		http.Error(w, "Error validating booking", http.StatusInternalServerError)
+		return
+	}
+	defer cbrows.Close()
+	// Process rows and append to bookings slice
+	for cbrows.Next() {
+		var b config.Booking
+		if err := cbrows.Scan(&b.ID, &b.UserID, &b.PropertyID, &b.RoomID, &b.Cost, &b.ReservInterval, &b.CreationDate); err != nil {
+			http.Error(w, "Error scanning booking row: %w", http.StatusInternalServerError)
+			return
+		}
+		cb = append(cb, b)
+	}
+	// Check for errors after iterating through rows
+	if err := cbrows.Err(); err != nil {
+		http.Error(w, "Error iterating booking rows: %w", http.StatusInternalServerError)
+	}
+
+	log.Printf("Booking created successfully in %v", time.Since(st))
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintln(w, "Booking created successfully")
+	if err := json.NewEncoder(w).Encode(cb); err != nil {
+		log.Printf("Error encoding bookings to JSON: %v", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+	}
 }
 
 func DontBook(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +125,7 @@ func DontBook(w http.ResponseWriter, r *http.Request) {
 
 	// VALIDATE
 	if _, err := strconv.Atoi(bId); err != nil {
-		log.Printf("CancelBooking: Invalid booking ID: %v", err)
+		log.Printf("Invalid booking ID az cancellation of booking: %v", err)
 		http.Error(w, "Invalid booking ID", http.StatusBadRequest)
 		return
 	}
@@ -104,7 +136,7 @@ func DontBook(w http.ResponseWriter, r *http.Request) {
 			WHERE id = $1
 		`, bId)
 	if err != nil {
-		log.Printf("CancelBooking: Error canceling booking: %v", err)
+		log.Printf("Error canceling booking: %v", err)
 		http.Error(w, "Error canceling booking", http.StatusInternalServerError)
 		return
 	}
@@ -112,7 +144,7 @@ func DontBook(w http.ResponseWriter, r *http.Request) {
 	// CHECK ROWS AFFECTED OR NOT
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		log.Printf("CancelBooking: Error getting rows affected: %v", err)
+		log.Printf("Error getting rows affected: %v", err)
 		http.Error(w, "Error during cancellation", http.StatusInternalServerError)
 		return
 	}
@@ -121,7 +153,7 @@ func DontBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("CancelBooking: Booking canceled successfully in %v", time.Since(st))
+	log.Printf("Booking canceled successfully in %v", time.Since(st))
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "Booking canceled successfully")
 }
