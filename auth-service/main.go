@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,32 +14,11 @@ import (
 	"github.com/kristofkruller/BookingApp/libs/initdb"
 )
 
-const (
-	maxRetries    = 5               // Maximum number of retries
-	retryInterval = 5 * time.Second // Time to wait between retries
-)
-
 func main() {
-	var err error
-
 	// Initialize database with retry
-	var db *sql.DB
-	for i := 0; i < maxRetries; i++ {
-		db, err = initdb.InitDB()
-		if err == nil {
-			break
-		}
-
-		log.Printf("Failed to connect to database, attempt %d/%d: %v", i+1, maxRetries, err)
-
-		if i < maxRetries-1 {
-			log.Printf("Retrying in %v...", retryInterval)
-			time.Sleep(retryInterval)
-		}
-	}
-
+	db, err := initdb.InitDb()
 	if err != nil {
-		log.Fatalf("Could not connect to database after %d attempts: %v", maxRetries, err)
+		log.Fatalf("could not connect to database after 3 attempts %v", err)
 	}
 
 	//DB conn for users pkg

@@ -27,6 +27,14 @@ message DontReq {
 }
 message BookingsOfReq {
   int32 uId = 1;
+  BookingFilter filter = 2;
+}
+message BookingFilter {
+  float min_price = 1;
+  float max_price = 2;
+  string creation_date = 3;
+  string start_date = 4;
+  string end_date = 5;
 }
 message BookingReq {
   int32 user_id = 1;
