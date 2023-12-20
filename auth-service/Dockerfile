@@ -1,19 +1,23 @@
-FROM golang:1.21 as builder
+# Example Dockerfile for auth-service
+FROM golang:1.21.4-alpine AS builder
 
-WORKDIR /usr/src/app
+# Set the working directory inside the container
+WORKDIR /app
 
-# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
-COPY go.mod go.sum ./
+# Copy the go.mod and go.sum files first and download dependencies (for better caching)
+COPY ./auth-service/go.mod ./auth-service/go.sum ./auth-service/
+RUN cd /app/auth-service && go mod download && go mod verify
 
-RUN go mod download && go mod verify
+# Copy the local package files to the container's workspace
+COPY ./libs /app/libs
+COPY ./auth-service /app/auth-service
 
-COPY . .
+# Build your application
+RUN cd /app/auth-service && CGO_ENABLED=0 GOOS=linux go build -v -o main .
 
-# Build the Go app.
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o /usr/local/bin/app .
-# Start a new stage from scratch for a smaller final image.
-FROM alpine:latest
-# Copy the pre-built binary file from the previous stage.
-COPY --from=builder /usr/local/bin/app /usr/local/bin/app
+# Use a smaller base image to create a final slim image
+FROM alpine:latest  
+COPY --from=builder /app/auth-service/main /app/main
 
-CMD ["app"]
+# Run the application
+CMD ["/app/main"]

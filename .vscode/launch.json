@@ -7,8 +7,9 @@
           "request": "launch",
           "mode": "auto",
           "program": "${workspaceFolder}/auth-service",
-          "envFile": "${workspaceFolder}/.env",
-          "args": ["--log", "info"]
+          "envFile": "${workspaceFolder}/local.env",
+          "args": ["--log", "info"],
+          "output": "${workspaceFolder}/auth-service/out/auth-service"
       },
       {
           "name": "Debug Check Service",
@@ -16,8 +17,10 @@
           "request": "launch",
           "mode": "auto",
           "program": "${workspaceFolder}/check-service",
-          "envFile": "${workspaceFolder}/.env",
-          "args": ["--log", "info"]
+          "envFile": "${workspaceFolder}/local.env",
+          "args": ["--log", "info"],
+          "output": "${workspaceFolder}/check-service/out/check-service"
+
       },
       {
           "name": "Debug Booking Service",
@@ -25,17 +28,19 @@
           "request": "launch",
           "mode": "auto",
           "program": "${workspaceFolder}/booking-service",
-          "envFile": "${workspaceFolder}/.env",
-          "args": ["--log", "info"]
+          "envFile": "${workspaceFolder}/local.env",
+          "args": ["--log", "info"],
+          "output": "${workspaceFolder}/booking-service/out/booking-service"
       },
       {
-        "name": "DBSeeder Service",
+        "name": "Debug Payment Service",
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceFolder}/db-seeder",
-        "envFile": "${workspaceFolder}/.env",
-        "args": ["--log", "info"]
+        "program": "${workspaceFolder}/payment-service",
+        "envFile": "${workspaceFolder}/local.env",
+        "args": ["--log", "info"],
+        "output": "${workspaceFolder}/payment-service/out/payment-service"
       }
   ]
 }

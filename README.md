@@ -162,7 +162,7 @@ It is functioning as a go "script".
 ### Env
 **MUST BE CREATED AT PROJECT _ROOT ._**
 _Exposed env content for development_
-*env is not commited because of best practice*
+*.env is not commited because of best practice*
 ```
 DB_PASSWORD=asdf1234
 POSTGRES_DB=BookingAppDb
@@ -179,7 +179,8 @@ DB_CONNECTION_SEED=postgres://admin:asdf1234@127.0.0.1/BookingAppDb?sslmode=disa
 The project is set up for development with VS Code through WSL Debian. A launch.json file is included for debugging:
 - `Run and Debug - Ctrl+Shift+D` then you can start all services separately without containerized environment.
 - Run `docker-compose -f docker-compose.yml up db` this will set up the db as a separate container but without the other services. You should seed it with `go run ./db-seeder/main.go`
-To let the services consume the env file you must modify files (implement godotenv.Load(), use env-flagging, etc.) this is not finished yet completely.
+**there should be a local.env for launch.json, where DB_HOST=127.0.0.1** otherwise the connection will die with timeout.
+This way of starting produces a brand new fresh binary to the out folder as well optimized for Linux environments.
 
 ## Notes on possible improvements
 - Helper functions, types and code for general use must be regorganized to a lib, with functionality like in every `main.go` the program exits gracefully or time handlers. 

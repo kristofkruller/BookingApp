@@ -18,8 +18,25 @@ start_docker_services() {
     docker-compose up -d
     if [ $? -ne 0 ]; then
         echo "Failed to start Docker services."
+        revert_go_mod_changes
         exit 1
     fi
+}
+
+# Function to update go.mod files for Docker builds
+update_go_mod_for_docker() {
+    echo "Updating go.mod files for Docker builds..."
+    local services=("auth-service" "check-service" "booking-service" "payment-service")
+    for service in "${services[@]}"; do
+        local go_mod_path="./${service}/go.mod"
+        if [ -f "$go_mod_path" ]; then
+            # Comment out the replace directive
+            sed -i.bak 's/^replace/\/\/replace/' "$go_mod_path"
+            echo "Updated go.mod for $service"
+        else
+            echo "go.mod not found for $service"
+        fi
+    done
 }
 
 # Function to wait for services to be ready
@@ -44,23 +61,43 @@ wait_for_services() {
     return 1
 }
 
+# Function to revert go.mod files to original state
+revert_go_mod_changes() {
+    echo "Reverting go.mod files to original state..."
+    local services=("auth-service" "check-service" "booking-service" "payment-service")
+    for service in "${services[@]}"; do
+        local go_mod_path="./${service}/go.mod"
+        local backup_path="${go_mod_path}.bak"
+        if [ -f "$backup_path" ]; then
+            mv "$backup_path" "$go_mod_path"
+            echo "Reverted go.mod for $service"
+        else
+            echo "Backup go.mod not found for $service"
+        fi
+    done
+}
+
 # Function to run db-seeder
 run_db_seeder() {
     echo "Running db-seeder..."
     go run ./db-seeder/main.go
     if [ $? -ne 0 ]; then
         echo "Failed to run db-seeder."
+        revert_go_mod_changes
         exit 1
     fi
 }
 
 # Main script execution
+update_go_mod_for_docker
 start_docker_services
 wait_for_services
 if [ $? -eq 0 ]; then
     run_db_seeder
+    revert_go_mod_changes
 else
     echo "Aborting due to services not starting correctly."
     docker-compose -f docker-compose.yml down -v --remove-orphans
+    revert_go_mod_changes
     exit 1
 fi

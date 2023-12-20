@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgtype"
 	"github.com/kristofkruller/BookingApp/check-service/config"
-	"github.com/kristofkruller/BookingApp/check-service/helpers"
+	"github.com/kristofkruller/BookingApp/libs/helpers"
 )
 
 var db *sql.DB
@@ -175,7 +175,7 @@ func ListRooms(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Printf("Fetched room: %v", room)
-		if rp != nil && !isRoomAvailable(room.ID, *rp) {
+		if rp != nil && !helpers.IsRoomAvailable(room.ID, *rp, db) {
 			log.Printf("Room ID %d is not available for the requested period", room.ID)
 			continue // skip
 		}
@@ -193,34 +193,4 @@ func ListRooms(w http.ResponseWriter, r *http.Request) {
 	log.Println("Successfully retrieved rooms")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rooms)
-}
-
-// HELPERS
-func isRoomAvailable(roomID int, period pgtype.Tsrange) bool {
-	var count int
-	var lower, upper pgtype.Timestamp
-	lower.Set(period.Lower.Time)
-	upper.Set(period.Upper.Time)
-
-	tsrange := pgtype.Tsrange{
-		Lower:     lower,
-		Upper:     upper,
-		LowerType: period.LowerType,
-		UpperType: period.UpperType,
-		Status:    pgtype.Present,
-	}
-
-	err := db.QueryRow(`
-			SELECT COUNT(*) 
-			FROM reserv 
-			WHERE roomId = $1 
-			AND reserv_interval && $2
-	`, roomID, tsrange).Scan(&count)
-
-	if err != nil {
-		log.Printf("Error in isRoomAvailable: %v", err)
-		return false
-	}
-
-	return count == 0
 }

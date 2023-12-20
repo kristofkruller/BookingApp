@@ -8,3 +8,5 @@ require (
 )
 
 require github.com/joho/godotenv v1.5.1
+
+replace github.com/kristofkruller/BookingApp/libs => ../libs

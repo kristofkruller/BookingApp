@@ -6,4 +6,5 @@ use (
     ./booking-service
     ./db-seeder
     ./payment-service
+    ./libs
 )
